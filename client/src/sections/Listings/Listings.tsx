@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { server } from '../../lib/api';
 import {
+  Listing,
   ListingData,
   DeleteListingData,
   DeleteListingVariables
@@ -36,27 +37,46 @@ interface Props {
 
 export const Listings = ({ title }: Props) => {
 
+  const [listings, setListings] = useState<
+    Listing[] | null
+  >(null);
+
   const fetchListings = async () => {
     const { data } =
       await server.fetch<ListingData>( {query:LISTINGS} );
-    console.log(data);
+
+    setListings(data.listings)
   }
 
-  const deleteListings = async () => {
+  const deleteListings = async (id: string) => {
     const { data } =
       await server.fetch<DeleteListingData, DeleteListingVariables>( {
         query: DELETELISTING,
         variables: {
-          id: ""
+          id
         }
       } );
     console.log(data);
+    fetchListings();
   }
+
+  const listingsList = <ul>
+    {listings?.map( listing => {
+      return <li key={listing.id}>
+        {listing.title}
+        <button
+         onClick={() => deleteListings(listing.id)}
+        >
+          Delete
+        </button>
+      </li>
+    })}
+  </ul>
   return (
     <div>
       <h1>{title}</h1>
+      {listingsList}
       <button onClick={fetchListings}>Query Listings!</button>
-      <button onClick={deleteListings}>Delete Listing!</button>
     </div>
   )
 }
