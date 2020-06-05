@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import { server } from './server';
 
 interface State<TData> {
@@ -10,14 +10,18 @@ export const useQuery = <TData = any>(query: string) => {
     data: null
   });
 
-  useEffect(()=>{
+  const fetch = useCallback(() => {
     const fetchApi = async () => {
       const { data } = await server.fetch<TData>({ query });
       setState({ data });
-    }
+    };
 
     fetchApi();
+  },[query])
+
+  useEffect(()=>{
+    fetch();
   },[query]);
 
-  return state;
+  return {...state, refetch: fetch};
 }

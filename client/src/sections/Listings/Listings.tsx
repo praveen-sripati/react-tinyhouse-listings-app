@@ -36,7 +36,7 @@ interface Props {
 
 export const Listings = ({ title }: Props) => {
 
-  const { data } = useQuery<ListingData>(LISTINGS);
+  const { data, refetch } = useQuery<ListingData>(LISTINGS);
 
   const deleteListings = async (id: string) => {
     const { data } =
@@ -47,6 +47,7 @@ export const Listings = ({ title }: Props) => {
         }
       } );
     console.log(data);
+    refetch();
   }
 
   const listings = data?.listings;
