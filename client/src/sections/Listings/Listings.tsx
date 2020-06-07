@@ -1,5 +1,8 @@
 import React from 'react';
-import { server, useQuery } from '../../lib/api';
+import {
+  useQuery,
+  useMutation
+} from '../../lib/api';
 import {
   ListingData,
   DeleteListingData,
@@ -43,15 +46,19 @@ export const Listings = ({ title }: Props) => {
     refetch
   } = useQuery<ListingData>(LISTINGS);
 
-  const deleteListings = async (id: string) => {
-    const { data } =
-      await server.fetch<DeleteListingData, DeleteListingVariables>( {
-        query: DELETELISTING,
-        variables: {
-          id
-        }
-      } );
-    console.log(data);
+  const [
+    deleteListing,
+    {
+      loading: deleteListingLoading,
+      error: deleteListingError
+    }
+  ] = useMutation<
+    DeleteListingData,
+    DeleteListingVariables
+    >(DELETELISTING);
+
+  const handleDeleteListing = async (id: string) => {
+    await deleteListing({ id });
     refetch();
   }
 
@@ -62,7 +69,7 @@ export const Listings = ({ title }: Props) => {
       return <li key={listing.id}>
         {listing.title}
         <button
-         onClick={() => deleteListings(listing.id)}
+         onClick={() => handleDeleteListing(listing.id)}
         >
           Delete
         </button>
@@ -78,10 +85,22 @@ export const Listings = ({ title }: Props) => {
     return <h2>Uh oh! Something went wrong - please try again later :(</h2>
   }
 
+  const deleteListingLoadingMessage = deleteListingLoading ? (
+    <h4>Deletion in progress...</h4>
+  ) : null;
+
+  const deleteListingErrorMessage = deleteListingError ? (
+    <h4>
+      Uh oh! Something went wrong with deleting - please try again later :(
+    </h4>
+  ) : null;
+
   return (
     <div>
       <h1>{title}</h1>
       {listingsList}
+      {deleteListingLoadingMessage}
+      {deleteListingErrorMessage}
     </div>
   )
 }
