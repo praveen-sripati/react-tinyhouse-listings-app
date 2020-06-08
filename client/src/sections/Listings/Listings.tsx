@@ -4,11 +4,11 @@ import {
   useQuery,
   useMutation
 } from 'react-apollo';
+import { Listings as ListingData } from './__generated__/Listings';
 import {
-  ListingData,
-  DeleteListingData,
-  DeleteListingVariables
-} from './types';
+  DeleteListing as DeleteListingData, DeleteListingVariables
+} from './__generated__/DeleteListing';
+
 
 const LISTINGS = gql`
   query Listings {
